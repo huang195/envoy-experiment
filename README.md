@@ -73,4 +73,44 @@ data: {"jsonrpc":"2.0","id":1,"result":{"protocolVersion":"2025-03-26","capabili
 
 To test that we can modify headers based on the body, we add an additional field in the json payload `removeheaders`:
 
+```
+curl -v -N -L -X POST http://localhost:8000/mcp/  \
+-H "Content-Type: application/json" \
+-H "Accept: application/json, text/event-stream" \
+-d '
+{
+  "jsonrpc": "2.0",
+  "id": 1,
+  "method": "initialize",
+  "params": {
+    "protocolVersion": "2025-06-18",
+    "capabilities": {
+      "roots": {
+        "listChanged": true
+      },
+      "sampling": {}
+    },
+    "clientInfo": {
+      "name": "ExampleClient",
+      "version": "1.0.0"
+    }
+  },
+  "removeheaders": true
+}
+'
+```
 
+You should get a 404 error this time, because we have removed HTTP request headers.
+
+5. MCP Inspector
+
+One can start the MCP inspector locally and point to the gateway:
+
+```
+DANGEROUSLY_OMIT_AUTH=true npx @modelcontextprotocol/inspector
+```
+
+In the web browser, change transport to `Streamable HTTP` and use URL: `http://localhost:8000/mcp/`.
+
+This should connect successfully. Other MCP gateway functions are not available in this repo as this project is to specifically 
+to test a few upstream changes to make sure the WASM-specific problem is indeed fixed.
