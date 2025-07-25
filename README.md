@@ -100,7 +100,32 @@ curl -v -N -L -X POST http://localhost:8000/mcp/  \
 '
 ```
 
-You should get a 404 error this time, because we have removed HTTP request headers.
+You should get a 406 error this time, because we have removed the ACCEPT http header based on the body content.
+
+```
+* Host localhost:8000 was resolved.
+* IPv6: ::1
+* IPv4: 127.0.0.1
+*   Trying [::1]:8000...
+* Connected to localhost (::1) port 8000
+> POST /mcp/ HTTP/1.1
+> Host: localhost:8000
+> User-Agent: curl/8.7.1
+> Content-Type: application/json
+> Accept: application/json, text/event-stream
+> Content-Length: 333
+> 
+* upload completely sent off: 333 bytes
+< HTTP/1.1 406 Not Acceptable
+< date: Fri, 25 Jul 2025 13:15:00 GMT
+< server: envoy
+< content-type: application/json
+< mcp-session-id: 2e64fbacbe4045ab91390e6bd90890ac
+< content-length: 152
+< x-envoy-upstream-service-time: 2
+< 
+{"jsonrpc":"2.0","id":"server-error","error":{"code":-32600,"message":"Not Acceptable: Client must accept both application/json and text/event-stream"}}* Connection #0 to host localhost left intact
+```
 
 5. MCP Inspector
 
