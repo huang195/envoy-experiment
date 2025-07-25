@@ -15,11 +15,15 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
-	"strings"
 	"github.com/proxy-wasm/proxy-wasm-go-sdk/proxywasm"
 	"github.com/proxy-wasm/proxy-wasm-go-sdk/proxywasm/types"
 )
+
+type RequestPayload struct {
+	ID int `json:"id"`
+}
 
 func main() {}
 func init() {
@@ -94,8 +98,14 @@ func (ctx *mcpGatewayContext) OnHttpRequestBody(bodySize int, endOfStream bool) 
 		return types.ActionContinue
 	}
 
-	if strings.TrimSpace(string(payload)) == "remove-all-headers" {
-		proxywasm.LogWarnf("Detected 'remove-all-headers' payload, removing all request headers")
+	var reqPayload RequestPayload
+	if err := json.Unmarshal(payload, &reqPayload); err != nil {
+		proxywasm.LogWarnf("Failed to parse JSON payload: %v", err)
+		return types.ActionContinue
+	}
+
+	if reqPayload.ID != 1 {
+		proxywasm.LogWarnf("Detected ID != 1 (%d), removing all request headers", reqPayload.ID)
 		
 		headers, err := proxywasm.GetHttpRequestHeaders()
 		if err != nil {
