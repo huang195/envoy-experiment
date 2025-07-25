@@ -22,7 +22,7 @@ import (
 )
 
 type RequestPayload struct {
-	removeHeaders bool `json:"removeheaders"`
+	RemoveHeaders bool `json:"removeheaders"`
 }
 
 func main() {}
@@ -106,9 +106,9 @@ func (ctx *mcpGatewayContext) OnHttpRequestBody(bodySize int, endOfStream bool) 
 		return types.ActionContinue
 	}
 
-	proxywasm.LogWarnf("removeHeaders: %v", reqPayload.removeHeaders)
+	proxywasm.LogWarnf("removeHeaders: %v", reqPayload.RemoveHeaders)
 
-	if reqPayload.removeHeaders {
+	if reqPayload.RemoveHeaders {
 		proxywasm.LogWarnf("removeHeaders is true, removing all request headers")
 		
 		headers, err := proxywasm.GetHttpRequestHeaders()

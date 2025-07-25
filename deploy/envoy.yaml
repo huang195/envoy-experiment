@@ -91,7 +91,7 @@ data:
                             uri: "https://raw.githubusercontent.com/huang195/envoy-experiment/main/wasm/plugin.wasm"
                             cluster: wasm_cluster
                             timeout: 5s
-                          sha256: "c906ef84f271e4f932d39375acdd2d2b01100d5dcb1062f6bef32963232b99eb"
+                          sha256: "ba0e95427a9f19ec5671492b3c4ede58e78b4920f2ad48567542483422763022"
               - name: envoy.filters.http.router
                 typed_config:
                   "@type": type.googleapis.com/envoy.extensions.filters.http.router.v3.Router
