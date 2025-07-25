@@ -95,7 +95,7 @@ curl -v -N -L -X POST http://localhost:8000/mcp/  \
       "version": "1.0.0"
     }
   },
-  "removeheaders": true
+  "removeacceptheader": true
 }
 '
 ```
