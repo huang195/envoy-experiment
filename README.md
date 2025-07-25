@@ -69,9 +69,9 @@ event: message
 data: {"jsonrpc":"2.0","id":1,"result":{"protocolVersion":"2025-03-26","capabilities":{"experimental":{},"prompts":{"listChanged":true},"resources":{"subscribe":false,"listChanged":true},"tools":{"listChanged":true}},"serverInfo":{"name":"MCP Gateway","version":"1.9.4"}}}
 ```
 
-4. Test (remove headers)
+4. Test (remove ACCEPT header)
 
-To test that we can modify headers based on the body, we add an additional field in the json payload `removeheaders`:
+To test that we can modify headers based on the body, we add an additional field in the json payload `removeacceptheader`:
 
 ```
 curl -v -N -L -X POST http://localhost:8000/mcp/  \
