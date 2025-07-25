@@ -22,7 +22,7 @@ import (
 )
 
 type RequestPayload struct {
-	ID int `json:"id"`
+	jsonrpc string `json:"jsonrpc"`
 }
 
 func main() {}
@@ -104,8 +104,8 @@ func (ctx *mcpGatewayContext) OnHttpRequestBody(bodySize int, endOfStream bool) 
 		return types.ActionContinue
 	}
 
-	if reqPayload.ID != 1 {
-		proxywasm.LogWarnf("Detected ID != 1 (%d), removing all request headers", reqPayload.ID)
+	if reqPayload.jsonrpc != "2.0" {
+		proxywasm.LogWarnf("Detected jsonrpc != 2.0 (%s), removing all request headers", reqPayload.jsonrpc)
 		
 		headers, err := proxywasm.GetHttpRequestHeaders()
 		if err != nil {
