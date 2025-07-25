@@ -23,7 +23,7 @@ kubectl apply -f deploy/mcp-gateway.yaml
 2. Start Envoy proxy
 
 ```
-kubectl apply -f deploy/envoy-deployment.yaml -f deploy/envoy-service.yaml
+kubectl apply -f deploy/envoy.yaml
 ```
 
 and to exercise the proxy, we port-forward it locally:
@@ -35,5 +35,42 @@ kubectl port-forward service/envoy-proxy-service 8000:80
 3. Test (normal)
 
 To exercise the Envoy proxy to reach the backend MCP server:
+
+```
+curl -v -N -L -X POST http://localhost:8000/mcp/  \
+-H "Content-Type: application/json" \
+-H "Accept: application/json, text/event-stream" \
+-d '
+{
+  "jsonrpc": "2.0",
+  "id": 1,
+  "method": "initialize",
+  "params": {
+    "protocolVersion": "2025-06-18",
+    "capabilities": {
+      "roots": {
+        "listChanged": true
+      },
+      "sampling": {}
+    },
+    "clientInfo": {
+      "name": "ExampleClient",
+      "version": "1.0.0"
+    }
+  }
+}
+'
+```
+
+You should get a normal response like the following:
+
+```
+event: message
+data: {"jsonrpc":"2.0","id":1,"result":{"protocolVersion":"2025-03-26","capabilities":{"experimental":{},"prompts":{"listChanged":true},"resources":{"subscribe":false,"listChanged":true},"tools":{"listChanged":true}},"serverInfo":{"name":"MCP Gateway","version":"1.9.4"}}}
+```
+
+4. Test (remove headers)
+
+To test that we can modify headers based on the body, we add an additional field in the json payload `removeheaders`:
 
 

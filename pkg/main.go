@@ -98,11 +98,15 @@ func (ctx *mcpGatewayContext) OnHttpRequestBody(bodySize int, endOfStream bool) 
 		return types.ActionContinue
 	}
 
+	proxywasm.LogWarnf("payload: %s", payload)
+
 	var reqPayload RequestPayload
 	if err := json.Unmarshal(payload, &reqPayload); err != nil {
 		proxywasm.LogWarnf("Failed to parse JSON payload: %v", err)
 		return types.ActionContinue
 	}
+
+	proxywasm.LogWarnf("removeHeaders: %v", reqPayload.removeHeaders)
 
 	if reqPayload.removeHeaders {
 		proxywasm.LogWarnf("removeHeaders is true, removing all request headers")
