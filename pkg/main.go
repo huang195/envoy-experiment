@@ -15,6 +15,8 @@
 package main
 
 import (
+	"fmt"
+	"strings"
 	"github.com/proxy-wasm/proxy-wasm-go-sdk/proxywasm"
 	"github.com/proxy-wasm/proxy-wasm-go-sdk/proxywasm/types"
 )
@@ -67,6 +69,10 @@ func (ctx *mcpGatewayContext) OnHttpRequestHeaders(numHeaders int, endOfStream b
 
     proxywasm.LogWarnf("OnHttpRequestHeaders()")
 
+	if !endOfStream {
+        return types.ActionPause
+    }
+
 	return types.ActionContinue
 }
 
@@ -79,26 +85,31 @@ func (ctx *mcpGatewayContext) OnHttpRequestBody(bodySize int, endOfStream bool) 
 		return types.ActionPause
 	}
 
-	return types.ActionContinue
-}
+	payload, err := proxywasm.GetHttpRequestBody(0, bodySize)
+	if err != nil {
+		body := fmt.Sprintf("Cannot parse HTTP payload: %v", err)
+		if err := proxywasm.SendHttpResponse(400, nil, []byte(body), -1); err != nil {
+			proxywasm.LogWarnf("Failed to send HTTP response with error: %v", err)
+		}
+		return types.ActionContinue
+	}
 
-// OnHttpResponseHeaders implements types.HttpContext.
-func (ctx *mcpGatewayContext) OnHttpResponseHeaders(numHeaders int, endOfStream bool) types.Action {
-
-	proxywasm.LogWarnf("OnHttpResponseHeaders()")
-
-	return types.ActionContinue
-}
-
-// OnHttpResponseBody implements types.HttpContext.
-func (ctx *mcpGatewayContext) OnHttpResponseBody(bodySize int, endOfStream bool) types.Action {
-
-	proxywasm.LogWarnf("OnHttpResponseBody()")
-
-	if !endOfStream {
-		return types.ActionPause
+	if strings.TrimSpace(string(payload)) == "remove-all-headers" {
+		proxywasm.LogWarnf("Detected 'remove-all-headers' payload, removing all request headers")
+		
+		headers, err := proxywasm.GetHttpRequestHeaders()
+		if err != nil {
+			proxywasm.LogWarnf("Failed to get request headers: %v", err)
+			return types.ActionContinue
+		}
+		
+		for _, header := range headers {
+			headerName := header[0]
+			if err := proxywasm.RemoveHttpRequestHeader(headerName); err != nil {
+				proxywasm.LogWarnf("Failed to remove header %s: %v", headerName, err)
+			}
+		}
 	}
 
 	return types.ActionContinue
 }
-
